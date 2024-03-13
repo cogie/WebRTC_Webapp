@@ -10,6 +10,18 @@ let cam = async () => {
   });
   document.getElementById("user1").srcObject = localStream;
   createOffer();
-}
+};
+
+let createOffer = async () => {
+  peerConnection = new RTCPeerConnection();
+
+  remoteStream = new MediaStream();
+  document.getElementById("user2").srcObject = remoteStream;
+
+  let offer = await peerConnection.createOffer();
+  await peerConnection.setLocalDescription(offer);
+
+  console.log("Offer: ", offer);
+};
 
 cam();
