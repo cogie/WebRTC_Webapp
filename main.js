@@ -2,6 +2,13 @@ let localStream; //local camera and video feed && mic audio
 let remoteStream; //once connected to the other user it will be that user remote video and audio data
 let peerConnection; //manages the offer
 
+let app_id = "8ef820e2fca3423da7f380f5d2341a8a"; //from Agora App id
+let token = null;
+let uid = String(Math.floor(Math.random() * 10000)); //how we identify who is you or howmany users in the channel
+
+let client; //will be used in logging in
+let channel; //will be the room like that 2 users can join
+
 const servers = {
   iceServer: [
     {
@@ -12,6 +19,18 @@ const servers = {
 
 //function to ask a permission to the users camera
 let cam = async () => {
+  client = await AgoraRTM.createInstance(app_id);
+
+  //login
+  await client.login({ uid, token });
+
+  //index.htm?room=87723 create channel
+  channel = client.createChannel("main");
+  await channel.join();
+
+  //if someone calls joind trigger
+  channel.on("MemberJoined", handleUserJoined);
+
   //request permission to access camera feed
   localStream = await navigator.mediaDevices.getUserMedia({
     video: true,
@@ -19,6 +38,10 @@ let cam = async () => {
   });
   document.getElementById("user1").srcObject = localStream;
   createOffer();
+};
+
+let handleUserJoined = async (MemberId) => {
+  console.log("New user joined", MemberId);
 };
 
 //function to create offer
@@ -50,7 +73,8 @@ let createOffer = async () => {
     }
   };
 
-  let offer = await peerConnection.createOffer();
+  //create the actual offer
+  let offer = await peerConnection.createOffer(); //each peercon has an offer/ans
   await peerConnection.setLocalDescription(offer);
 
   console.log("Offer: ", offer);
