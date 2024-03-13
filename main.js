@@ -9,6 +9,7 @@ let uid = String(Math.floor(Math.random() * 10000)); //how we identify who is yo
 let client; //will be used in logging in
 let channel; //will be the room like that 2 users can join
 
+//setup ice server and pass to rtcPeercon
 const servers = {
   iceServer: [
     {
