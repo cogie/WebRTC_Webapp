@@ -49,7 +49,8 @@ let handleUserJoined = async (MemberId) => {
 };
 
 let handleMessageFromPeer = async (message, MemberId) => {
-  console.log('Message: ', message.text);
+  message = JSON.parse(message.text); //parse the msg
+  console.log("Message: ", message);
 };
 
 //function to create offer
@@ -60,6 +61,16 @@ let createOffer = async (MemberId) => {
   // set up media data and add the data to it after/later
   remoteStream = new MediaStream();
   document.getElementById("user2").srcObject = remoteStream;
+
+  //to prevent a restart
+  if (!localStream) {
+    //request permission to access camera feed
+    localStream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: false,
+    });
+    document.getElementById("user1").srcObject = localStream;
+  }
 
   //loop through single tracks and aad
   localStream.getTracks().forEach((track) => {
@@ -77,7 +88,15 @@ let createOffer = async (MemberId) => {
   peerConnection.onicecandidate = async (event) => {
     //check if theres candidate
     if (event.candidate) {
-      console.log("New candidate: ", event.candidate);
+      client.sendMessageToPeer(
+        {
+          text: JSON.stringify({
+            type: "candidate",
+            candidate: event.candidate,
+          }),
+        },
+        MemberId
+      );
     }
   };
 
@@ -86,7 +105,10 @@ let createOffer = async (MemberId) => {
   await peerConnection.setLocalDescription(offer);
 
   console.log("Offer: ", offer);
-  client.sendMessageToPeer({ text: "Halooo" }, MemberId); //send a message to that MemberId
+  client.sendMessageToPeer(
+    { text: JSON.stringify({ type: "offer", offer: offer }) },
+    MemberId
+  ); //send a message to that MemberId
 };
 
 cam();
