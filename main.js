@@ -32,21 +32,28 @@ let cam = async () => {
   //if someone calls joind trigger
   channel.on("MemberJoined", handleUserJoined);
 
+  //need response to a message
+  client.on("MessageFromPeer", handleMessageFromPeer);
+
   //request permission to access camera feed
   localStream = await navigator.mediaDevices.getUserMedia({
     video: true,
     audio: false,
   });
   document.getElementById("user1").srcObject = localStream;
-  createOffer();
 };
 
 let handleUserJoined = async (MemberId) => {
   console.log("New user joined", MemberId);
+  createOffer(MemberId); //pass
+};
+
+let handleMessageFromPeer = async (message, MemberId) => {
+  console.log('Message: ', message.text);
 };
 
 //function to create offer
-let createOffer = async () => {
+let createOffer = async (MemberId) => {
   //setting up the peer connection
   peerConnection = new RTCPeerConnection(servers);
 
@@ -79,6 +86,7 @@ let createOffer = async () => {
   await peerConnection.setLocalDescription(offer);
 
   console.log("Offer: ", offer);
+  client.sendMessageToPeer({ text: "Halooo" }, MemberId); //send a message to that MemberId
 };
 
 cam();
