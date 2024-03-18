@@ -9,6 +9,15 @@ let uid = String(Math.floor(Math.random() * 10000)); //how we identify who is yo
 let client; //will be used in logging in
 let channel; //will be the room like that 2 users can join
 
+let queryString = window.location.search;
+let urlParams = new URLSearchParams(queryString);
+let roomId = urlParams.get("room");
+
+//verify if users has a rooms ID if none redirect to lobby page
+if (!roomId) {
+  window.location = "lobby.html";
+}
+
 //setup ice server and pass to rtcPeercon
 const servers = {
   iceServer: [
@@ -26,11 +35,14 @@ let cam = async () => {
   await client.login({ uid, token });
 
   //index.htm?room=87723 create channel
-  channel = client.createChannel("main");
+  channel = client.createChannel(roomId);
   await channel.join();
 
   //if someone calls joind trigger
   channel.on("MemberJoined", handleUserJoined);
+
+  //if users leave
+  channel.on("MemberLeft", handleUserleft);
 
   //need response to a message
   client.on("MessageFromPeer", handleMessageFromPeer);
@@ -43,24 +55,45 @@ let cam = async () => {
   document.getElementById("user1").srcObject = localStream;
 };
 
+//handle users left
+let handleUserleft = async (MemberId) => {
+  document.getElementById("user2").style.display = "none"; //if users leave it will hide it
+};
+
+// let handleMessageFromPeer = async (message, MemberId) => {
+//   message = JSON.parse(message.text); //parse the msg
+
+//   //process the offer/asnwer
+//   if (message.type === "offer") {
+//     createAnswer(MemberId, message.offer);
+//   }
+
+//   if (message.type === "answer") {
+//     adddAnswer(message.answer);
+//   }
+
+//   if (message.type === "candidate") {
+//     if (peerConnection) {
+//       peerConnection.addIceCandidate(message.candidate);
+//     }
+//   }
+
+//   console.log("Message: ", message);
+// };
+
 let handleUserJoined = async (MemberId) => {
   console.log("New user joined", MemberId);
   createOffer(MemberId); //pass
 };
 
-let handleMessageFromPeer = async (message, MemberId) => {
-  message = JSON.parse(message.text); //parse the msg
-  console.log("Message: ", message);
-};
-
-//function to create offer
-let createOffer = async (MemberId) => {
+let createPeerConnection = async (MemberId) => {
   //setting up the peer connection
   peerConnection = new RTCPeerConnection(servers);
 
   // set up media data and add the data to it after/later
   remoteStream = new MediaStream();
   document.getElementById("user2").srcObject = remoteStream;
+  document.getElementById("user2").style.display = "block"; //block the user 2 if its not active
 
   //to prevent a restart
   if (!localStream) {
@@ -99,16 +132,75 @@ let createOffer = async (MemberId) => {
       );
     }
   };
+};
+
+//function to create offer
+let createOffer = async (MemberId) => {
+  //call this function to handle the offers
+  await createPeerConnection(MemberId);
 
   //create the actual offer
   let offer = await peerConnection.createOffer(); //each peercon has an offer/ans
   await peerConnection.setLocalDescription(offer);
 
   console.log("Offer: ", offer);
+
+  //SDP
   client.sendMessageToPeer(
     { text: JSON.stringify({ type: "offer", offer: offer }) },
     MemberId
   ); //send a message to that MemberId
 };
+
+//function to respond to offer. "answer"
+let createAnswer = async (MemberId, offer) => {
+  //call this function to handle the answers
+  await createPeerConnection(MemberId);
+
+  //set remoteDescription
+  await peerConnection.setRemoteDescription(offer);
+
+  let answer = await peerConnection.createAnswer();
+  await peerConnection.setLocalDescription(answer);
+
+  //SDP
+  client.sendMessageToPeer(
+    { text: JSON.stringify({ type: "answer", answer: answer }) },
+    MemberId
+  ); //send a answer to that MemberId
+};
+
+//
+let addAnswer = async (answer) => {
+  if (!peerConnection.currentRemoteDescription) {
+    peerConnection.setRemoteDescription(answer);
+  }
+};
+
+let leaveChannel = async () => {
+  await channel.leave();
+  await client.logout();
+};
+
+let handleMessageFromPeer = async (message, MemberId) => {
+  message = JSON.parse(message.text);
+
+  if (message.type === "offer") {
+    createAnswer(MemberId, message.offer);
+  }
+
+  if (message.type === "answer") {
+    addAnswer(message.answer);
+  }
+
+  if (message.type === "candidate") {
+    if (peerConnection) {
+      peerConnection.addIceCandidate(message.candidate);
+    }
+  }
+};
+
+//this handles when a client leave via exiting the tab
+window.addEventListener("beforeunload", leaveChannel);
 
 cam();
