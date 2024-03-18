@@ -50,7 +50,7 @@ let cam = async () => {
   //request permission to access camera feed
   localStream = await navigator.mediaDevices.getUserMedia({
     video: true,
-    audio: false,
+    audio: true,
   });
   document.getElementById("user1").srcObject = localStream;
 };
@@ -200,7 +200,44 @@ let handleMessageFromPeer = async (message, MemberId) => {
   }
 };
 
+//function for controls for camera
+let toggleCamera = async () => {
+  let videoTrack = localStream
+    .getTracks()
+    .find((track) => track.kind === "video");
+
+  //if video track enable
+  if (videoTrack.enabled) {
+    videoTrack.enabled = false;
+    document.getElementById("camera-btn").style.backgroundColor =
+      "rgb(255, 80, 80)";
+  } else {
+    videoTrack.enabled = true;
+    document.getElementById("camera-btn").style.backgroundColor =
+      "rgb(179, 102, 249, .9)";
+  }
+};
+//function for controls for audio
+let toggleMic = async () => {
+  let audioTrack = localStream
+    .getTracks()
+    .find((track) => track.kind === "audio");
+
+  //if video track enable
+  if (audioTrack.enabled) {
+    audioTrack.enabled = false;
+    document.getElementById("mic-btn").style.backgroundColor =
+      "rgb(255, 80, 80)";
+  } else {
+    audioTrack.enabled = true;
+    document.getElementById("mic-btn").style.backgroundColor =
+      "rgb(179, 102, 249, .9)";
+  }
+};
 //this handles when a client leave via exiting the tab
 window.addEventListener("beforeunload", leaveChannel);
 
+//for cammera
+document.getElementById("camera-btn").addEventListener("click", toggleCamera);
+document.getElementById("mic-btn").addEventListener("click", toggleMic);
 cam();
