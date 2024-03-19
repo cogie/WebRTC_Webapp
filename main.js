@@ -27,6 +27,22 @@ const servers = {
   ],
 };
 
+let constraints = {
+  video: {
+    width: {
+      min: 640,
+      ideal: 1920,
+      max: 1920,
+    },
+    height: {
+      min: 480,
+      ideal: 1080,
+      max: 1080,
+    },
+  },
+  audio: true,
+};
+
 //function to ask a permission to the users camera
 let cam = async () => {
   client = await AgoraRTM.createInstance(app_id);
@@ -48,10 +64,7 @@ let cam = async () => {
   client.on("MessageFromPeer", handleMessageFromPeer);
 
   //request permission to access camera feed
-  localStream = await navigator.mediaDevices.getUserMedia({
-    video: true,
-    audio: true,
-  });
+  localStream = await navigator.mediaDevices.getUserMedia(constraints);
   document.getElementById("user1").srcObject = localStream;
 };
 
