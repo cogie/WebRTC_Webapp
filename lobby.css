@@ -1,0 +1,113 @@
+/* body{
+    background-color: #1a1a1a;
+    color: #fff;
+}
+
+#form-container{
+    width: 90%;
+    max-width: 600px;
+    border-radius: 10px;
+    background-color: #262625;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+#form__container__header {
+    border-radius: 10px 10px 0 0;
+    padding: 30px;
+    text-align: center;
+    background-color: #363739;
+    margin: 0;
+    font-size: 18px;
+    font-size: 300;
+    line-height: 0;
+  }
+
+  #form__content__wrapper{
+    padding: 20px;
+}
+
+input {
+    box-sizing: border-box;
+    color: #fff;
+    width: 100%;
+    margin: 0;
+    border: none;
+    border-radius: 5px;
+    padding: 16px 20px;
+    font-size: 15px;
+    background-color: #3f434a;
+    margin-top: 32px;
+  }
+ 
+ 
+  input[type='submit'] {
+    background-color: #845695;
+ 
+  } */
+
+  body {
+    background-color: #f5f5f5; /* Light background */
+    font-family: sans-serif; /* Modern font */
+  }
+  
+  #form-container {
+    width: 90%;
+    max-width: 600px;
+    border-radius: 10px;
+    background-color: #fff; /* White background for the form */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  #form__container__header {
+    border-radius: 10px 10px 0 0;
+    padding: 30px;
+    text-align: center;
+    /* background-color: #f0f0f0; Lighter header background */
+    background-color: #845695;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500; /* Semi-bold font */
+    line-height: 1.5; /* More space between lines */
+    color: #fff;
+  }
+  
+  #form__content__wrapper {
+    padding: 20px;
+  }
+  
+  input {
+    box-sizing: border-box;
+    color: #333; /* Darker text color */
+    width: 100%;
+    margin: 0;
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 5px;
+    padding: 16px 20px;
+    font-size: 15px;
+    transition: all 0.2s ease-in-out; /* Smooth transition on hover */
+    margin-top: 32px;
+  }
+  
+  input:hover {
+    border-color: #845695; /* Change border color on hover */
+  }
+  
+  input[type="submit"] {
+    background-color: #845695;
+    color: #fff; /* White text for submit button */
+    border: none; /* Remove border for submit button */
+    cursor: pointer; /* Indicate clickable button */
+    transition: all 0.2s ease-in-out;
+  }
+  
+  input[type="submit"]:hover {
+    background-color: #7a4c8a; /* Darken submit button on hover */
+  }
