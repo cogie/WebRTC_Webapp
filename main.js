@@ -58,6 +58,7 @@ let cam = async () => {
 //handle users left
 let handleUserleft = async (MemberId) => {
   document.getElementById("user2").style.display = "none"; //if users leave it will hide it
+  document.getElementById("user1").classList.remove("smallFrame"); //if users leave it will hide it
 };
 
 // let handleMessageFromPeer = async (message, MemberId) => {
@@ -94,6 +95,7 @@ let createPeerConnection = async (MemberId) => {
   remoteStream = new MediaStream();
   document.getElementById("user2").srcObject = remoteStream;
   document.getElementById("user2").style.display = "block"; //block the user 2 if its not active
+  document.getElementById("user1").classList.add("smallFrame"); //frame for user 1
 
   //to prevent a restart
   if (!localStream) {
@@ -198,6 +200,8 @@ let handleMessageFromPeer = async (message, MemberId) => {
       peerConnection.addIceCandidate(message.candidate);
     }
   }
+
+  console.log("Message: ", message);
 };
 
 //function for controls for camera
